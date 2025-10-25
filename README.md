@@ -1,2 +1,2 @@
-# Lumo
-Lumo Go Framework
+# Oryn
+Oryn Go Framework
