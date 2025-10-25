@@ -1,2 +1,2 @@
-# goni
-Goni Go Framework
+# Lumo
+Lumo Go Framework
