@@ -14,6 +14,7 @@ import (
 	"go.opentelemetry.io/otel/metric"
 	sdklog "go.opentelemetry.io/otel/sdk/log"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
+	"go.opentelemetry.io/otel/sdk/metric/metricdata"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/sdk/trace/tracetest"
 	"go.opentelemetry.io/otel/trace"
@@ -34,6 +35,30 @@ func (r *recordingTB) Helper() {}
 
 func (r *recordingTB) Errorf(format string, args ...any) {
 	r.failures = append(r.failures, fmt.Sprintf(format, args...))
+}
+
+// Fatalf records the failure, and lets the helper continue.
+func (r *recordingTB) Fatalf(format string, args ...any) {
+	r.Errorf(format, args...)
+}
+
+// testProducer produces one metric per aggregation type, each with a data point having the test_key attribute.
+type testProducer struct{}
+
+func (testProducer) Produce(context.Context) ([]metricdata.ScopeMetrics, error) {
+	attrs := attribute.NewSet(attribute.String("test_key", "test_value"))
+
+	return []metricdata.ScopeMetrics{{Metrics: []metricdata.Metrics{
+		{Name: "int64_sum", Data: metricdata.Sum[int64]{DataPoints: []metricdata.DataPoint[int64]{{Attributes: attrs}}}},
+		{Name: "float64_sum", Data: metricdata.Sum[float64]{DataPoints: []metricdata.DataPoint[float64]{{Attributes: attrs}}}},
+		{Name: "int64_gauge", Data: metricdata.Gauge[int64]{DataPoints: []metricdata.DataPoint[int64]{{Attributes: attrs}}}},
+		{Name: "float64_gauge", Data: metricdata.Gauge[float64]{DataPoints: []metricdata.DataPoint[float64]{{Attributes: attrs}}}},
+		{Name: "int64_histogram", Data: metricdata.Histogram[int64]{DataPoints: []metricdata.HistogramDataPoint[int64]{{Attributes: attrs}}}},
+		{Name: "float64_histogram", Data: metricdata.Histogram[float64]{DataPoints: []metricdata.HistogramDataPoint[float64]{{Attributes: attrs}}}},
+		{Name: "int64_exponential_histogram", Data: metricdata.ExponentialHistogram[int64]{DataPoints: []metricdata.ExponentialHistogramDataPoint[int64]{{Attributes: attrs}}}},
+		{Name: "float64_exponential_histogram", Data: metricdata.ExponentialHistogram[float64]{DataPoints: []metricdata.ExponentialHistogramDataPoint[float64]{{Attributes: attrs}}}},
+		{Name: "summary", Data: metricdata.Summary{DataPoints: []metricdata.SummaryDataPoint{{Attributes: attrs}}}},
+	}}}, nil
 }
 
 func TestLogtest(t *testing.T) {
@@ -126,4 +151,102 @@ func TestMetrictest(t *testing.T) {
 	assert.False(t, metrictest.HasNoMetric(rec, reader, metrictest.WithName("test_histogram")))
 	require.Len(t, rec.failures, 2)
 	assert.Contains(t, rec.failures[0], `name="test_counter" unit="{call}"`)
+}
+
+func TestDescribe(t *testing.T) {
+	t.Parallel()
+
+	t.Run("logs", func(t *testing.T) {
+		t.Parallel()
+
+		exporter := logtest.NewInMemoryExporter()
+		provider := sdklog.NewLoggerProvider(sdklog.WithProcessor(sdklog.NewSimpleProcessor(exporter)))
+		logger := slog.New(otelslog.NewHandler("test", otelslog.WithLoggerProvider(provider)))
+
+		rec := &recordingTB{TB: t}
+		logtest.HasRecord(rec, exporter, logtest.WithBody("missing"))
+
+		for range 11 {
+			logger.Info("test_info")
+		}
+
+		logtest.HasRecord(rec, exporter, logtest.WithBody("missing"))
+
+		require.Len(t, rec.failures, 2)
+		assert.Contains(t, rec.failures[0], "records: none")
+		assert.Contains(t, rec.failures[1], "... and 1 more")
+	})
+
+	t.Run("spans", func(t *testing.T) {
+		t.Parallel()
+
+		exporter := tracetest.NewInMemoryExporter()
+		tracer := sdktrace.NewTracerProvider(sdktrace.WithSyncer(exporter)).Tracer("test")
+
+		rec := &recordingTB{TB: t}
+		spantest.HasSpan(rec, exporter, spantest.WithName("missing"))
+
+		for range 11 {
+			_, span := tracer.Start(t.Context(), "test_span", trace.WithAttributes(attribute.String("test_key", "test_value")))
+			span.End()
+		}
+
+		spantest.HasSpan(rec, exporter, spantest.WithName("missing"))
+
+		require.Len(t, rec.failures, 2)
+		assert.Contains(t, rec.failures[0], "spans: none")
+		assert.Contains(t, rec.failures[1], "... and 1 more")
+
+		assert.True(t, spantest.HasNoSpan(t, exporter, spantest.WithAttribute("missing")))
+		assert.True(t, spantest.HasNoSpan(t, exporter, spantest.WithAttributeValue(attribute.String("test_key", "other"))))
+	})
+
+	t.Run("metrics", func(t *testing.T) {
+		t.Parallel()
+
+		reader := sdkmetric.NewManualReader()
+		sdkmetric.NewMeterProvider(sdkmetric.WithReader(reader))
+
+		rec := &recordingTB{TB: t}
+		metrictest.HasMetric(rec, reader, metrictest.WithName("missing"))
+
+		require.Len(t, rec.failures, 1)
+		assert.Contains(t, rec.failures[0], "metrics: none")
+	})
+}
+
+func TestMetrictestAggregations(t *testing.T) {
+	t.Parallel()
+
+	reader := sdkmetric.NewManualReader(sdkmetric.WithProducer(testProducer{}))
+	sdkmetric.NewMeterProvider(sdkmetric.WithReader(reader))
+
+	value := attribute.String("test_key", "test_value")
+
+	for _, name := range []string{
+		"int64_sum", "float64_sum", "int64_gauge", "float64_gauge", "int64_histogram",
+		"float64_histogram", "int64_exponential_histogram", "float64_exponential_histogram",
+	} {
+		assert.True(t, metrictest.HasMetric(t, reader, metrictest.WithName(name), metrictest.WithAttributeValue(value)), name)
+	}
+
+	assert.True(t, metrictest.HasNoMetric(t, reader, metrictest.WithName("summary"), metrictest.WithAttributeValue(value)),
+		"unsupported aggregations have no attributes")
+
+	rec := &recordingTB{TB: t}
+	metrictest.Int64Sum(rec, reader, "float64_sum")
+
+	require.Len(t, rec.failures, 1)
+	assert.Contains(t, rec.failures[0], `metric "float64_sum" is a metricdata.Sum[float64], not an int64 sum`)
+}
+
+func TestMetrictestCollectFailure(t *testing.T) {
+	t.Parallel()
+
+	// A reader not registered with a meter provider cannot collect.
+	rec := &recordingTB{TB: t}
+	assert.Empty(t, metrictest.Collect(rec, sdkmetric.NewManualReader()))
+
+	require.Len(t, rec.failures, 1)
+	assert.Contains(t, rec.failures[0], "cannot collect metrics")
 }

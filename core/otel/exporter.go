@@ -137,12 +137,15 @@ func envSet(names ...string) bool {
 	return false
 }
 
+// firstNonEmpty returns the first non-empty value, trimmed and lower cased, or the last one.
 func firstNonEmpty(values ...string) string {
-	for _, value := range values {
+	var value string
+
+	for _, value = range values {
 		if value = strings.ToLower(strings.TrimSpace(value)); value != "" {
-			return value
+			break
 		}
 	}
 
-	return ""
+	return value
 }

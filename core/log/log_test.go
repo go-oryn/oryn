@@ -129,14 +129,16 @@ func TestNewLogger(t *testing.T) {
 	t.Run("console", func(t *testing.T) {
 		t.Parallel()
 
-		var logger *slog.Logger
+		for _, format := range []string{"text", "json"} {
+			var logger *slog.Logger
 
-		coretest.Start(t, core.New(), config.AsOptions(config.WithValues(map[string]any{
-			"log.console.enabled": true,
-			"log.console.format":  "json",
-		})), fx.Populate(&logger))
+			coretest.Start(t, core.New(), config.AsOptions(config.WithValues(map[string]any{
+				"log.console.enabled": true,
+				"log.console.format":  format,
+			})), fx.Populate(&logger))
 
-		require.NotNil(t, logger)
+			require.NotNil(t, logger, format)
+		}
 	})
 
 	t.Run("invalid config", func(t *testing.T) {
@@ -155,4 +157,16 @@ func TestNewLogger(t *testing.T) {
 			require.Error(t, app.Err(), name)
 		}
 	})
+}
+
+func TestNewLoggerSetDefault(t *testing.T) {
+	// Not parallel: replaces the default logger.
+	previous := slog.Default()
+	t.Cleanup(func() { slog.SetDefault(previous) })
+
+	var logger *slog.Logger
+
+	coretest.Start(t, core.New(), config.AsOptions(config.WithValues(map[string]any{"log.set_default": true})), fx.Populate(&logger))
+
+	assert.Same(t, logger, slog.Default())
 }

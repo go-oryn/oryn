@@ -37,23 +37,26 @@ func NewLoggerProvider(params NewLoggerProviderParams) (*sdklog.LoggerProvider, 
 		return nil, err
 	}
 
+	var exporter sdklog.Exporter
+
 	switch kind {
 	case ExporterOTLP:
-		exporter, err := newOTLPLogExporter(params.Config)
-		if err != nil {
-			return nil, fmt.Errorf("cannot create OTLP log exporter: %w", err)
-		}
-
-		options = append(options, sdklog.WithProcessor(sdklog.NewBatchProcessor(exporter)))
+		exporter, err = newOTLPLogExporter(params.Config)
 	case ExporterConsole:
-		exporter, err := stdoutlog.New()
-		if err != nil {
-			return nil, fmt.Errorf("cannot create console log exporter: %w", err)
-		}
-
-		options = append(options, sdklog.WithProcessor(sdklog.NewSimpleProcessor(exporter)))
+		exporter, err = stdoutlog.New()
 	case ExporterMemory:
-		options = append(options, sdklog.WithProcessor(sdklog.NewSimpleProcessor(params.Memory)))
+		exporter = params.Memory
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("cannot create %s log exporter: %w", kind, err)
+	}
+
+	switch {
+	case kind == ExporterOTLP:
+		options = append(options, sdklog.WithProcessor(sdklog.NewBatchProcessor(exporter)))
+	case exporter != nil:
+		options = append(options, sdklog.WithProcessor(sdklog.NewSimpleProcessor(exporter)))
 	}
 
 	provider := sdklog.NewLoggerProvider(append(options, params.Options...)...)

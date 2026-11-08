@@ -84,4 +84,26 @@ func TestApp(t *testing.T) {
 
 		require.ErrorContains(t, app.Err(), "missing type: string")
 	})
+	t.Run("runs until shutdown", func(t *testing.T) {
+		t.Parallel()
+
+		var stopped bool
+
+		core.New().Run(
+			coretest.TestOptions(),
+			fx.NopLogger,
+			fx.Invoke(func(lc fx.Lifecycle, shutdowner fx.Shutdowner) {
+				lc.Append(fx.Hook{
+					OnStart: func(context.Context) error { return shutdowner.Shutdown() },
+					OnStop: func(context.Context) error {
+						stopped = true
+
+						return nil
+					},
+				})
+			}),
+		)
+
+		assert.True(t, stopped)
+	})
 }

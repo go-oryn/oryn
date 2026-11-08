@@ -47,23 +47,26 @@ func NewTracerProvider(params NewTracerProviderParams) (*sdktrace.TracerProvider
 		return nil, err
 	}
 
+	var exporter sdktrace.SpanExporter
+
 	switch kind {
 	case ExporterOTLP:
-		exporter, err := newOTLPSpanExporter(params.Config)
-		if err != nil {
-			return nil, err
-		}
-
-		options = append(options, sdktrace.WithBatcher(exporter))
+		exporter, err = newOTLPSpanExporter(params.Config)
 	case ExporterConsole:
-		exporter, err := stdouttrace.New()
-		if err != nil {
-			return nil, fmt.Errorf("cannot create console span exporter: %w", err)
-		}
-
-		options = append(options, sdktrace.WithSyncer(exporter))
+		exporter, err = stdouttrace.New()
 	case ExporterMemory:
-		options = append(options, sdktrace.WithSyncer(params.Memory))
+		exporter = params.Memory
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("cannot create %s span exporter: %w", kind, err)
+	}
+
+	switch {
+	case kind == ExporterOTLP:
+		options = append(options, sdktrace.WithBatcher(exporter))
+	case exporter != nil:
+		options = append(options, sdktrace.WithSyncer(exporter))
 	}
 
 	provider := sdktrace.NewTracerProvider(append(options, params.Options...)...)

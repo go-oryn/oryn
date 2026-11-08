@@ -1,6 +1,7 @@
 package config_test
 
 import (
+	"errors"
 	"testing"
 	"testing/fstest"
 	"time"
@@ -141,6 +142,36 @@ func TestNew(t *testing.T) {
 		_, err := config.New(config.WithEnvironment(""), config.WithFS(fstest.MapFS{"app.yaml": {Data: []byte("test: [")}}))
 		require.ErrorContains(t, err, `cannot parse config file "app.yaml"`)
 	})
+
+	t.Run("invalid environment file", func(t *testing.T) {
+		t.Parallel()
+
+		_, err := config.New(config.WithEnvironment("prod"), config.WithFS(fstest.MapFS{"prod/app.yaml": {Data: []byte("test: [")}}))
+		require.ErrorContains(t, err, `cannot parse config file "prod/app.yaml"`)
+	})
+
+	t.Run("environment directory is a file", func(t *testing.T) {
+		t.Parallel()
+
+		_, err := config.New(config.WithEnvironment("prod"), config.WithFS(fstest.MapFS{"prod": {Data: []byte("test_string: prod")}}))
+		require.ErrorContains(t, err, `cannot read config directory "prod"`)
+	})
+
+	t.Run("unreadable file", func(t *testing.T) {
+		t.Parallel()
+
+		_, err := config.New(config.WithEnvironment(""), config.WithFS(unreadableFS{fstest.MapFS{"app.yaml": {}}}))
+		require.ErrorContains(t, err, `cannot read config file "app.yaml": test_error`)
+	})
+}
+
+// unreadableFS is a file system listing its files, but failing to read them.
+type unreadableFS struct {
+	fstest.MapFS
+}
+
+func (unreadableFS) ReadFile(string) ([]byte, error) {
+	return nil, errors.New("test_error")
 }
 
 func TestNewWithEnvironmentVariables(t *testing.T) {
