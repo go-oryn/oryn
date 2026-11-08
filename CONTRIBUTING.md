@@ -31,7 +31,14 @@ This repository uses [Conventional Commits](https://www.conventionalcommits.org/
 On every push to `main`, release-please opens or updates one release PR per changed module, with its changelog.
 Merging a release PR tags the module (e.g. `core/v0.2.0`), which is the tag format Go expects for a module in a sub directory.
 
-When a module depends on another one, Renovate opens a PR bumping the dependency right after its release.
+When a module depends on another one, bump the dependency once the other module is released:
+
+```shell
+cd httpserver
+go get github.com/go-oryn/oryn/core@v0.2.0
+go mod tidy
+```
+
 CI tests every module twice:
 
 - **Test** (required): with `go.work`, against the current code of the other modules.
@@ -40,7 +47,6 @@ CI tests every module twice:
 ### Repository setup
 
 - Create a GitHub App with `contents: write` and `pull-requests: write` permissions, install it on the repository, and set the `RELEASE_APP_ID` variable and the `RELEASE_APP_PRIVATE_KEY` secret. Release PRs opened with the default token would not trigger CI.
-- Install the [Renovate](https://github.com/apps/renovate) app.
 - Protect `main`, requiring the `CI` check.
 
 ## Adding a module
