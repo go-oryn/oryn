@@ -25,27 +25,39 @@ export default defineConfig({
 			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/go-oryn/oryn' }],
 			lastUpdated: true,
 			sidebar: [
-				{ label: 'Start here', items: [{ label: 'Overview', slug: 'index' }, 'getting-started', 'agents'] },
 				{
-					label: 'Core',
-					items: [
-						'core/application',
-						'core/configuration',
-						'core/opentelemetry',
-						'core/health',
-						'core/testing',
-					],
+					label: 'Start here',
+					items: [{ label: 'Overview', slug: 'index' }, 'getting-started', 'demo', 'agents'],
 				},
 				{
-					label: 'HTTP server',
-					items: [{ label: 'Overview', slug: 'httpserver/overview' }, 'httpserver/routing', 'httpserver/observability', 'httpserver/testing'],
+					label: 'Modules',
+					items: [
+						{
+							label: 'Core',
+							items: ['core/application', 'core/configuration', 'core/opentelemetry', 'core/health', 'core/testing'],
+						},
+						{
+							label: 'HTTP server',
+							items: [
+								{ label: 'Overview', slug: 'httpserver/overview' },
+								'httpserver/routing',
+								'httpserver/observability',
+								'httpserver/testing',
+							],
+						},
+						{
+							label: 'SQL',
+							items: [{ label: 'Overview', slug: 'sql/overview' }, 'sql/migrations', 'sql/testing'],
+						},
+					],
 				},
 			],
 			plugins: [
 				starlightLlmsTxt({
 					projectName: 'oryn',
 					details: [
-						'- oryn is a Go framework: applications are assembled from modules (core, httpserver...) with uber/fx dependency injection.',
+						'- oryn is a Go framework: applications are assembled from modules (core, httpserver, sql...) with uber/fx dependency injection.',
+						'- A complete example application: https://github.com/go-oryn/demo',
 						'- Extension points are `AsXxx` helpers (e.g. `httpserver.AsHandler`, `health.AsProbe`) taking values or fx constructors.',
 						'- Every module is instrumented with OpenTelemetry; standard `OTEL_*` environment variables win over the `otel.*` config keys.',
 						'- Tests run applications with `coretest.Start` and assert telemetry in memory with the `oteltest` packages.',
@@ -54,8 +66,8 @@ export default defineConfig({
 					customSets: [
 						{
 							label: 'Start here',
-							description: 'overview, getting started guide, and the rules for agents writing oryn code',
-							paths: ['index', 'getting-started', 'agents'],
+							description: 'overview, getting started guide, demo application, and the rules for agents writing oryn code',
+							paths: ['index', 'getting-started', 'demo', 'agents'],
 						},
 						{
 							label: 'Core',
@@ -66,6 +78,11 @@ export default defineConfig({
 							label: 'HTTP server',
 							description: 'the httpserver module: handlers, middlewares, handler groups, observability and testing',
 							paths: ['httpserver/**'],
+						},
+						{
+							label: 'SQL',
+							description: 'the sql module: PostgreSQL, MySQL and SQLite connection pool, migrations, observability and testing',
+							paths: ['sql/**'],
 						},
 					],
 				}),

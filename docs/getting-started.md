@@ -155,6 +155,7 @@ go test ./...
 
 ## Next steps
 
+- [Demo application](demo.md): a complete application, with a database, migrations and a local observability stack.
 - [Application](core/application.md): how an oryn application is assembled.
 - [HTTP server](httpserver/overview.md): handlers, middlewares and handler groups.
 - [OpenTelemetry](core/opentelemetry.md): exporters, sampling and the `OTEL_*` variables.

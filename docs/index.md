@@ -40,9 +40,12 @@ An application is the [core](core/application.md) module plus the modules it nee
 |---|---|
 | [core](core/application.md) | Runtime, configuration, OpenTelemetry, logging, health checks, test helpers |
 | [httpserver](httpserver/overview.md) | HTTP server on `net/http`, with handlers, middlewares and handler groups |
+| [sql](sql/overview.md) | `database/sql` pool to PostgreSQL, MySQL or SQLite, with migrations |
 | httpclient, grpcserver, grpcclient | Planned |
 
 Modules are extended the same way everywhere: you register your own handlers, middlewares, probes or options with `AsXxx` helpers, and fx builds them with their dependencies. There is no global state to set up and no registration order to get right.
+
+To see them working together, run the [demo application](demo.md).
 
 ## OpenTelemetry instrumented
 
