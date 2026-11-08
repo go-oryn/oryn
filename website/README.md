@@ -13,3 +13,7 @@ npm run preview   # serves dist/
 - Pages are the `docs/**/*.md` files: plain Markdown with a `title` and `description` frontmatter. No MDX or components, so agents can read them as is.
 - Link pages with relative `.md` links (`[Testing](../core/testing.md)`): they work on GitHub, and are turned into website links at build time.
 - Add new pages to the `sidebar` of [astro.config.mjs](astro.config.mjs), and to the `customSets` of the llms.txt plugin when adding a module.
+
+## Deployment
+
+The [Docs workflow](../.github/workflows/docs.yml) builds and deploys the website to GitHub Pages, https://go-oryn.github.io/oryn/, on every push to `main` changing `docs/` or `website/`. It can also be run by hand from the Actions tab.
