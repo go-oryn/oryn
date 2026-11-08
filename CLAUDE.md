@@ -29,7 +29,8 @@ Go framework built on uber/fx, OpenTelemetry native. One Go module per top level
 ## Documentation
 
 - Add Go doc comments to all exported identifiers, and a package comment in the main file of each package.
-- Keep the module README in sync with its config keys.
+- The user documentation lives in `docs/` (plain Markdown, rendered by the Starlight site in `website/`). Keep it in sync with the code, in particular the config keys tables. Module READMEs stay short and link to it.
+- Docs pages have a `title` and `description` frontmatter, no MDX. Link pages with relative `.md` links. Register new pages in the `website/astro.config.mjs` sidebar.
 
 ## Checks
 

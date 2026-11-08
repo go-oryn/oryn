@@ -14,6 +14,16 @@ golangci-lint run --config ../.golangci.yml ./...
 golangci-lint fmt --config ../.golangci.yml ./...
 ```
 
+## Documentation
+
+The documentation website is built from the Markdown files of `docs/`, see [website/README.md](website/README.md):
+
+```shell
+cd website
+npm ci
+npm run dev
+```
+
 ## Commit conventions
 
 This repository uses [Conventional Commits](https://www.conventionalcommits.org/) and [release-please](https://github.com/googleapis/release-please). Scope commits with the module name:
@@ -68,5 +78,6 @@ CI tests every module twice:
      paths:
        - foo/
    ```
-4. Add the code, tests and a `README.md`, following [CLAUDE.md](CLAUDE.md).
-5. Add it to the modules table of the [README](README.md).
+4. Add the code, tests and a short `README.md`, following [CLAUDE.md](CLAUDE.md).
+5. Document it in `docs/<module>/`, and register the pages in the sidebar and llms.txt sets of [website/astro.config.mjs](website/astro.config.mjs).
+6. Add it to the modules table of the [README](README.md) and of [docs/index.md](docs/index.md).

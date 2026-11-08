@@ -18,6 +18,12 @@ func main() {
 }
 ```
 
+## Documentation
+
+**https://go-oryn.github.io/oryn/**: getting started, guides and configuration reference.
+
+The documentation is written for humans and agents: the website is built from the Markdown files of [docs/](docs), and published for agents as [llms.txt](https://go-oryn.github.io/oryn/llms.txt) and [llms-full.txt](https://go-oryn.github.io/oryn/llms-full.txt).
+
 ## Modules
 
 Each module is a Go module of this repository, versioned and released independently.

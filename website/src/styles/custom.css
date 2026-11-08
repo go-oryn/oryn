@@ -1,0 +1,49 @@
+/* oryn brand: the yellow of the logo mark. */
+:root {
+	--oryn-yellow: #f7bd2e;
+	--sl-color-accent-low: #3d2e08;
+	--sl-color-accent: #c48f12;
+	--sl-color-accent-high: #f7bd2e;
+}
+
+/* Light theme: a darker amber keeps links and buttons readable on white. */
+:root[data-theme='light'] {
+	--sl-color-accent-low: #fdf0cc;
+	--sl-color-accent: #a86b00;
+	--sl-color-accent-high: #5c3a00;
+}
+
+/* Header: mark and title side by side. */
+.site-title {
+	gap: 0.6rem;
+	font-weight: 700;
+	letter-spacing: -0.02em;
+}
+
+.site-title img {
+	height: 1.9rem;
+	width: auto;
+}
+
+/* Homepage hero: the mark floats on a soft glow. */
+.hero {
+	padding-block: 2.5rem 1.5rem;
+}
+
+.hero > img {
+	max-width: min(13rem, 60%);
+	filter: drop-shadow(0 0 3rem color-mix(in srgb, var(--oryn-yellow) 35%, transparent));
+}
+
+.hero h1 {
+	letter-spacing: -0.03em;
+}
+
+/* Primary buttons: dark text on the yellow. */
+.sl-link-button.primary {
+	color: #1c1405;
+}
+
+:root[data-theme='light'] .sl-link-button.primary {
+	color: #fff;
+}
