@@ -1,0 +1,183 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  detect:
+    name: Detect modules
+    runs-on: ubuntu-latest
+    outputs:
+      modules: ${{ steps.detect.outputs.modules }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Detect changed modules and their dependents
+        id: detect
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          # Every directory holding a go.mod is a module.
+          ALL=$(find . -mindepth 2 -maxdepth 2 -name go.mod -exec dirname {} \; | sed 's|^\./||' | sort)
+          echo "All modules: $(echo $ALL)"
+
+          if [ "$EVENT_NAME" = "workflow_dispatch" ] || [ -z "$BEFORE$BASE_REF" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            CHANGED_FILES=""
+            RUN_ALL=true
+          else
+            if [ "$EVENT_NAME" = "pull_request" ]; then
+              BASE=$(git merge-base "origin/$BASE_REF" HEAD)
+            else
+              BASE="$BEFORE"
+            fi
+            CHANGED_FILES=$(git diff --name-only "$BASE" HEAD)
+            # Shared tooling changes affect every module.
+            if echo "$CHANGED_FILES" | grep -qE '^(\.golangci\.yml|go\.work|\.github/)'; then
+              RUN_ALL=true
+            fi
+          fi
+
+          if [ "$RUN_ALL" = "true" ]; then
+            SELECTED="$ALL"
+          else
+            SELECTED=""
+            for module in $ALL; do
+              if echo "$CHANGED_FILES" | grep -q "^$module/"; then
+                SELECTED="$SELECTED $module"
+              fi
+            done
+
+            # Add the modules depending on a selected module, until nothing changes.
+            while true; do
+              BEFORE_COUNT=$(echo $SELECTED | wc -w)
+              for module in $ALL; do
+                for dependency in $SELECTED; do
+                  if grep -q "github.com/go-oryn/oryn/$dependency " "$module/go.mod" && ! echo " $SELECTED " | grep -q " $module "; then
+                    SELECTED="$SELECTED $module"
+                  fi
+                done
+              done
+              [ "$(echo $SELECTED | wc -w)" = "$BEFORE_COUNT" ] && break
+            done
+          fi
+
+          MODULES=$(echo $SELECTED | tr ' ' '\n' | grep -v '^$' | sort -u | jq -R . | jq -sc .)
+          echo "Selected modules: $MODULES"
+          echo "modules=$MODULES" >> "$GITHUB_OUTPUT"
+
+  test:
+    name: Test ${{ matrix.module }}
+    needs: detect
+    if: needs.detect.outputs.modules != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module: ${{ fromJson(needs.detect.outputs.modules) }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: ${{ matrix.module }}/go.mod
+          cache-dependency-path: ${{ matrix.module }}/go.sum
+
+      # Workspace mode (go.work): tests the module against the current code of the other modules.
+      - name: Vet
+        working-directory: ${{ matrix.module }}
+        run: go vet ./...
+
+      - name: Test
+        working-directory: ${{ matrix.module }}
+        run: go test -race -coverpkg=./... -coverprofile=coverage.txt ./...
+
+      - name: Coverage summary
+        working-directory: ${{ matrix.module }}
+        run: |
+          COVERAGE=$(go tool cover -func=coverage.txt | tail -1 | awk '{print $3}')
+          echo "### \`${{ matrix.module }}\` coverage: $COVERAGE" >> "$GITHUB_STEP_SUMMARY"
+
+  release-mode:
+    name: Release mode ${{ matrix.module }}
+    needs: detect
+    if: needs.detect.outputs.modules != '[]'
+    runs-on: ubuntu-latest
+    # Tests the module against the released versions of the other modules, as users get it.
+    # It fails when a change needs an unreleased module: informative, not blocking.
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        module: ${{ fromJson(needs.detect.outputs.modules) }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: ${{ matrix.module }}/go.mod
+          cache-dependency-path: ${{ matrix.module }}/go.sum
+
+      - name: Test without workspace
+        working-directory: ${{ matrix.module }}
+        env:
+          GOWORK: "off"
+        run: |
+          go mod verify
+          go test ./...
+
+  lint:
+    name: Lint ${{ matrix.module }}
+    needs: detect
+    if: needs.detect.outputs.modules != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module: ${{ fromJson(needs.detect.outputs.modules) }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: ${{ matrix.module }}/go.mod
+          cache-dependency-path: ${{ matrix.module }}/go.sum
+
+      - name: Check go.mod is tidy
+        working-directory: ${{ matrix.module }}
+        run: |
+          go mod tidy
+          git diff --exit-code -- go.mod go.sum
+
+      - uses: golangci/golangci-lint-action@v8
+        with:
+          version: v2.15.0
+          working-directory: ${{ matrix.module }}
+          args: --config ../.golangci.yml
+
+  ci:
+    name: CI
+    needs: [detect, test, lint]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      # Single required status check for branch protection.
+      - name: Check results
+        run: |
+          if [ "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}" = "true" ]; then
+            echo "Some jobs failed"
+            exit 1
+          fi

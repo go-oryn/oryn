@@ -1,0 +1,87 @@
+version: "2"
+
+run:
+  timeout: 5m
+
+linters:
+  default: none
+  enable:
+    - asasalint
+    - asciicheck
+    - bidichk
+    - bodyclose
+    - containedctx
+    - contextcheck
+    - cyclop
+    - dogsled
+    - dupl
+    - durationcheck
+    - errcheck
+    - errchkjson
+    - errname
+    - errorlint
+    - exhaustive
+    - forcetypeassert
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - godot
+    - gosec
+    - govet
+    - importas
+    - ineffassign
+    - interfacebloat
+    - loggercheck
+    - maintidx
+    - makezero
+    - misspell
+    - nestif
+    - nilerr
+    - nilnil
+    - nlreturn
+    - noctx
+    - nolintlint
+    - perfsprint
+    - prealloc
+    - predeclared
+    - reassign
+    - revive
+    - staticcheck
+    - thelper
+    - tparallel
+    - unconvert
+    - unparam
+    - unused
+    - usestdlibvars
+    - usetesting
+    - whitespace
+  settings:
+    misspell:
+      locale: US
+    revive:
+      rules:
+        - name: exported
+  exclusions:
+    presets:
+      - comments
+      - std-error-handling
+    rules:
+      # Tests favor readability over these checks.
+      - path: _test\.go
+        linters:
+          - dupl
+          - goconst
+          - maintidx
+          - forcetypeassert
+
+formatters:
+  enable:
+    - gci
+    - gofumpt
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - prefix(github.com/go-oryn/oryn)
