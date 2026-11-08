@@ -57,12 +57,30 @@ export default defineConfig({
 							],
 						},
 						{
+							label: 'HTTP client',
+							items: [
+								{ label: 'Overview', slug: 'httpclient/overview' },
+								'httpclient/configuration',
+								'httpclient/observability',
+								'httpclient/testing',
+							],
+						},
+						{
 							label: 'gRPC server',
 							items: [
 								{ label: 'Overview', slug: 'grpcserver/overview' },
 								'grpcserver/configuration',
 								'grpcserver/observability',
 								'grpcserver/testing',
+							],
+						},
+						{
+							label: 'gRPC client',
+							items: [
+								{ label: 'Overview', slug: 'grpcclient/overview' },
+								'grpcclient/configuration',
+								'grpcclient/observability',
+								'grpcclient/testing',
 							],
 						},
 						{
@@ -75,6 +93,15 @@ export default defineConfig({
 							],
 						},
 						{
+							label: 'MCP client',
+							items: [
+								{ label: 'Overview', slug: 'mcpclient/overview' },
+								'mcpclient/configuration',
+								'mcpclient/observability',
+								'mcpclient/testing',
+							],
+						},
+						{
 							label: 'SQL',
 							items: [
 								{ label: 'Overview', slug: 'sql/overview' },
@@ -84,6 +111,33 @@ export default defineConfig({
 								'sql/testing',
 							],
 						},
+						{
+							label: 'Validator',
+							items: [
+								{ label: 'Overview', slug: 'validator/overview' },
+								'validator/configuration',
+								'validator/observability',
+								'validator/testing',
+							],
+						},
+						{
+							label: 'Worker',
+							items: [
+								{ label: 'Overview', slug: 'worker/overview' },
+								'worker/configuration',
+								'worker/observability',
+								'worker/testing',
+							],
+						},
+						{
+							label: 'Cron',
+							items: [
+								{ label: 'Overview', slug: 'cron/overview' },
+								'cron/configuration',
+								'cron/observability',
+								'cron/testing',
+							],
+						},
 					],
 				},
 			],
@@ -91,7 +145,7 @@ export default defineConfig({
 				starlightLlmsTxt({
 					projectName: 'oryn',
 					details: [
-						'- oryn is a Go framework: applications are assembled from modules (core, httpserver, grpcserver, mcpserver, sql) with uber/fx dependency injection.',
+						'- oryn is a Go framework: applications are assembled from modules (core, httpserver, httpclient, grpcserver, grpcclient, mcpserver, mcpclient, sql, validator, worker, cron) with uber/fx dependency injection.',
 						'- A complete example application, serving one domain module over HTTP, gRPC and MCP: https://github.com/go-oryn/demo',
 						'- Extension points are `AsXxx` helpers (e.g. `httpserver.AsHandler`, `health.AsProbe`) taking values or fx constructors.',
 						'- Every module is instrumented with OpenTelemetry; standard `OTEL_*` environment variables win over the `otel.*` config keys.',
@@ -128,6 +182,36 @@ export default defineConfig({
 							label: 'MCP server',
 							description: 'the mcpserver module: MCP tools, resources and prompts, streamable HTTP, observability and testing',
 							paths: ['mcpserver/**'],
+						},
+						{
+							label: 'HTTP client',
+							description: 'the httpclient module: instrumented HTTP client, transport middlewares, configuration and in-memory testing',
+							paths: ['httpclient/**'],
+						},
+						{
+							label: 'gRPC client',
+							description: 'the grpcclient module: named gRPC connections, interceptors, configuration and in-memory testing',
+							paths: ['grpcclient/**'],
+						},
+						{
+							label: 'MCP client',
+							description: 'the mcpclient module: sessions to MCP servers, configuration, observability and in-memory testing',
+							paths: ['mcpclient/**'],
+						},
+						{
+							label: 'Validator',
+							description: 'the validator module: struct validation, custom validations, observability and testing',
+							paths: ['validator/**'],
+						},
+						{
+							label: 'Worker',
+							description: 'the worker module: background workers, restarts, health, observability and testing',
+							paths: ['worker/**'],
+						},
+						{
+							label: 'Cron',
+							description: 'the cron module: scheduled jobs, schedules per environment, observability and testing',
+							paths: ['cron/**'],
 						},
 						{
 							label: 'SQL',

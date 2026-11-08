@@ -12,12 +12,28 @@
       "component": "core",
       "initial-version": "0.1.0"
     },
+    "cron": {
+      "component": "cron",
+      "initial-version": "0.1.0"
+    },
+    "grpcclient": {
+      "component": "grpcclient",
+      "initial-version": "0.1.0"
+    },
     "grpcserver": {
       "component": "grpcserver",
       "initial-version": "0.1.0"
     },
+    "httpclient": {
+      "component": "httpclient",
+      "initial-version": "0.1.0"
+    },
     "httpserver": {
       "component": "httpserver",
+      "initial-version": "0.1.0"
+    },
+    "mcpclient": {
+      "component": "mcpclient",
       "initial-version": "0.1.0"
     },
     "mcpserver": {
@@ -26,6 +42,14 @@
     },
     "sql": {
       "component": "sql",
+      "initial-version": "0.1.0"
+    },
+    "validator": {
+      "component": "validator",
+      "initial-version": "0.1.0"
+    },
+    "worker": {
+      "component": "worker",
       "initial-version": "0.1.0"
     }
   }

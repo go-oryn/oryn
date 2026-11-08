@@ -35,9 +35,12 @@ Each module is a Go module of this repository, versioned and released independen
 | [grpcserver](grpcserver) | gRPC server, with services and interceptors registered through fx, health and reflection | In progress | [![grpcserver coverage](https://codecov.io/gh/go-oryn/oryn/graph/badge.svg?flag=grpcserver)](https://codecov.io/gh/go-oryn/oryn?flags%5B0%5D=grpcserver) |
 | [mcpserver](mcpserver) | Model Context Protocol server, with tools, resources and prompts registered through fx | In progress | [![mcpserver coverage](https://codecov.io/gh/go-oryn/oryn/graph/badge.svg?flag=mcpserver)](https://codecov.io/gh/go-oryn/oryn?flags%5B0%5D=mcpserver) |
 | [sql](sql) | `database/sql` pool to PostgreSQL, MySQL or SQLite, with migrations | In progress | [![sql coverage](https://codecov.io/gh/go-oryn/oryn/graph/badge.svg?flag=sql)](https://codecov.io/gh/go-oryn/oryn?flags%5B0%5D=sql) |
-| httpclient | Instrumented HTTP client | Planned |  |
-| grpcclient | Instrumented gRPC client connections | Planned |  |
-| worker, cron, validator | | Later |  |
+| [httpclient](httpclient) | Instrumented HTTP client, with transport middlewares and in-memory testing | In progress | [![httpclient coverage](https://codecov.io/gh/go-oryn/oryn/graph/badge.svg?flag=httpclient)](https://codecov.io/gh/go-oryn/oryn?flags%5B0%5D=httpclient) |
+| [grpcclient](grpcclient) | Instrumented gRPC client connections, configured by name, with in-memory testing | In progress | [![grpcclient coverage](https://codecov.io/gh/go-oryn/oryn/graph/badge.svg?flag=grpcclient)](https://codecov.io/gh/go-oryn/oryn?flags%5B0%5D=grpcclient) |
+| [mcpclient](mcpclient) | Model Context Protocol client sessions to MCP servers, configured by name, with in-memory testing | In progress | [![mcpclient coverage](https://codecov.io/gh/go-oryn/oryn/graph/badge.svg?flag=mcpclient)](https://codecov.io/gh/go-oryn/oryn?flags%5B0%5D=mcpclient) |
+| [validator](validator) | Struct and field validation, with custom validations registered through fx | In progress | [![validator coverage](https://codecov.io/gh/go-oryn/oryn/graph/badge.svg?flag=validator)](https://codecov.io/gh/go-oryn/oryn?flags%5B0%5D=validator) |
+| [worker](worker) | Long-running background workers, with restarts and health | In progress | [![worker coverage](https://codecov.io/gh/go-oryn/oryn/graph/badge.svg?flag=worker)](https://codecov.io/gh/go-oryn/oryn?flags%5B0%5D=worker) |
+| [cron](cron) | Scheduled jobs, with cron expressions configurable per environment | In progress | [![cron coverage](https://codecov.io/gh/go-oryn/oryn/graph/badge.svg?flag=cron)](https://codecov.io/gh/go-oryn/oryn?flags%5B0%5D=cron) |
 
 ```shell
 go get github.com/go-oryn/oryn/core

@@ -43,7 +43,12 @@ An application is the [core](core/application.md) module plus the modules it nee
 | [grpcserver](grpcserver/overview.md) | gRPC server, with services, interceptors, health and reflection |
 | [mcpserver](mcpserver/overview.md) | Model Context Protocol server, exposing tools, resources and prompts to AI agents |
 | [sql](sql/overview.md) | `database/sql` pool to PostgreSQL, MySQL or SQLite, with migrations |
-| httpclient, grpcclient | Planned |
+| [httpclient](httpclient/overview.md) | Instrumented HTTP client, with transport middlewares |
+| [grpcclient](grpcclient/overview.md) | Instrumented gRPC client connections, configured by name |
+| [mcpclient](mcpclient/overview.md) | MCP client sessions, to call the tools of other MCP servers |
+| [validator](validator/overview.md) | Struct and field validation, with custom validations |
+| [worker](worker/overview.md) | Long-running background workers, with restarts and health |
+| [cron](cron/overview.md) | Scheduled jobs |
 
 Modules are extended the same way everywhere: you register your own handlers, middlewares, probes or options with `AsXxx` helpers, and fx builds them with their dependencies. There is no global state to set up and no registration order to get right.
 

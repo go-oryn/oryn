@@ -25,18 +25,36 @@ flag_management:
     - name: core
       paths:
         - core/
+    - name: cron
+      paths:
+        - cron/
+    - name: grpcclient
+      paths:
+        - grpcclient/
     - name: grpcserver
       paths:
         - grpcserver/
+    - name: httpclient
+      paths:
+        - httpclient/
     - name: httpserver
       paths:
         - httpserver/
+    - name: mcpclient
+      paths:
+        - mcpclient/
     - name: mcpserver
       paths:
         - mcpserver/
     - name: sql
       paths:
         - sql/
+    - name: validator
+      paths:
+        - validator/
+    - name: worker
+      paths:
+        - worker/
 
 ignore:
   - "**/*_test.go"

@@ -139,4 +139,10 @@ The other modules document their keys on their Configuration page:
 | `httpserver.*` | [HTTP server configuration](../httpserver/configuration.md) |
 | `grpcserver.*` | [gRPC server configuration](../grpcserver/configuration.md) |
 | `mcpserver.*` | [MCP server configuration](../mcpserver/configuration.md) |
+| `httpclient.*` | [HTTP client configuration](../httpclient/configuration.md) |
+| `grpcclient.*` | [gRPC client configuration](../grpcclient/configuration.md) |
+| `mcpclient.*` | [MCP client configuration](../mcpclient/configuration.md) |
 | `sql.*` | [SQL configuration](../sql/configuration.md) |
+| `validator.*` | [Validator configuration](../validator/configuration.md) |
+| `worker.*` | [Worker configuration](../worker/configuration.md) |
+| `cron.*` | [Cron configuration](../cron/configuration.md) |

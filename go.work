@@ -2,8 +2,14 @@ go 1.26.0
 
 use (
 	./core
+	./cron
+	./grpcclient
 	./grpcserver
+	./httpclient
 	./httpserver
+	./mcpclient
 	./mcpserver
 	./sql
+	./validator
+	./worker
 )
