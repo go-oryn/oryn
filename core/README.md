@@ -1,6 +1,7 @@
 # core
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/go-oryn/oryn/core.svg)](https://pkg.go.dev/github.com/go-oryn/oryn/core)
+[![codecov](https://codecov.io/gh/go-oryn/oryn/graph/badge.svg?flag=core)](https://app.codecov.io/gh/go-oryn/oryn?flags%5B0%5D=core)
 
 > The foundation of every oryn application: [fx](https://uber-go.github.io/fx/) runtime, configuration, OpenTelemetry, logging and health checks.
 

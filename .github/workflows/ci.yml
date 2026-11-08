@@ -84,6 +84,10 @@ jobs:
     needs: detect
     if: needs.detect.outputs.modules != '[]'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # Codecov authenticates the coverage upload with a GitHub OIDC token, no secret needed.
+      id-token: write
     strategy:
       fail-fast: false
       matrix:
@@ -110,6 +114,16 @@ jobs:
         run: |
           COVERAGE=$(go tool cover -func=coverage.txt | tail -1 | awk '{print $3}')
           echo "### \`${{ matrix.module }}\` coverage: $COVERAGE" >> "$GITHUB_STEP_SUMMARY"
+
+      # One flag per module; unchanged modules keep their last coverage (carryforward, see codecov.yml).
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          use_oidc: ${{ !(github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork) }}
+          files: ${{ matrix.module }}/coverage.txt
+          flags: ${{ matrix.module }}
+          name: ${{ matrix.module }}
+          fail_ci_if_error: false
 
   release-mode:
     name: Release mode ${{ matrix.module }}

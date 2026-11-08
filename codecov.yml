@@ -1,0 +1,34 @@
+# Codecov configuration: https://docs.codecov.com/docs/codecovyml-reference
+
+codecov:
+  require_ci_to_pass: true
+
+coverage:
+  status:
+    # Report coverage changes on PRs without blocking them.
+    project:
+      default:
+        informational: true
+    patch:
+      default:
+        informational: true
+
+# Go coverage profiles use import paths: map them to the repository files.
+fixes:
+  - "github.com/go-oryn/oryn/::"
+
+# CI only tests the changed modules: the others keep their last uploaded coverage.
+flag_management:
+  default_rules:
+    carryforward: true
+  individual_flags:
+    - name: core
+      paths:
+        - core/
+
+ignore:
+  - "**/*_test.go"
+
+comment:
+  layout: "condensed_header, flags, files"
+  require_changes: true

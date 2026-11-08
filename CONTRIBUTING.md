@@ -47,6 +47,7 @@ CI tests every module twice:
 ### Repository setup
 
 - Create a GitHub App with `contents: write` and `pull-requests: write` permissions, install it on the repository, and set the `RELEASE_APP_ID` variable and the `RELEASE_APP_PRIVATE_KEY` secret. Release PRs opened with the default token would not trigger CI.
+- Install the [Codecov GitHub App](https://github.com/apps/codecov) on the repository. The coverage upload authenticates with GitHub OIDC: no token to store.
 - Protect `main`, requiring the `CI` check.
 
 ## Adding a module
@@ -61,5 +62,11 @@ CI tests every module twice:
    ```json
    "foo": { "component": "foo", "initial-version": "0.1.0" }
    ```
-3. Add the code, tests and a `README.md`, following [CLAUDE.md](CLAUDE.md).
-4. Add it to the modules table of the [README](README.md).
+3. Register its coverage flag in [codecov.yml](codecov.yml):
+   ```yaml
+   - name: foo
+     paths:
+       - foo/
+   ```
+4. Add the code, tests and a `README.md`, following [CLAUDE.md](CLAUDE.md).
+5. Add it to the modules table of the [README](README.md).
