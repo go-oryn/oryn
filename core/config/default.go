@@ -13,35 +13,38 @@ func (c *Config) GetStringOrDefault(key string, defaultValue string) string {
 
 // GetBoolOrDefault returns the bool value of key, or defaultValue if the key is not set.
 func (c *Config) GetBoolOrDefault(key string, defaultValue bool) bool {
-	if c.IsSet(key) && c.GetString(key) != "" {
+	if c.isSet(key) {
 		return c.GetBool(key)
 	}
 
 	return defaultValue
 }
 
-// GetIntOrDefault returns the int value of key, or defaultValue if the key is not set or zero.
+// GetIntOrDefault returns the int value of key, or defaultValue if the key is not set or empty.
+// An explicit zero is returned as is: 0 can mean "none" or "unlimited".
 func (c *Config) GetIntOrDefault(key string, defaultValue int) int {
-	if value := c.GetInt(key); c.IsSet(key) && value != 0 {
-		return value
+	if c.isSet(key) {
+		return c.GetInt(key)
 	}
 
 	return defaultValue
 }
 
-// GetFloat64OrDefault returns the float64 value of key, or defaultValue if the key is not set or zero.
+// GetFloat64OrDefault returns the float64 value of key, or defaultValue if the key is not set or empty.
+// An explicit zero is returned as is: 0 can mean "none" or "unlimited".
 func (c *Config) GetFloat64OrDefault(key string, defaultValue float64) float64 {
-	if value := c.GetFloat64(key); c.IsSet(key) && value != 0 {
-		return value
+	if c.isSet(key) {
+		return c.GetFloat64(key)
 	}
 
 	return defaultValue
 }
 
-// GetDurationOrDefault returns the duration value of key, or defaultValue if the key is not set or zero.
+// GetDurationOrDefault returns the duration value of key, or defaultValue if the key is not set or empty.
+// An explicit zero is returned as is: 0 can mean "none" or "unlimited".
 func (c *Config) GetDurationOrDefault(key string, defaultValue time.Duration) time.Duration {
-	if value := c.GetDuration(key); c.IsSet(key) && value != 0 {
-		return value
+	if c.isSet(key) {
+		return c.GetDuration(key)
 	}
 
 	return defaultValue
@@ -63,4 +66,10 @@ func (c *Config) GetStringMapStringOrDefault(key string, defaultValue map[string
 	}
 
 	return defaultValue
+}
+
+// isSet reports whether key is set to a non-empty value. An empty value, like an
+// environment variable placeholder expanding to nothing, is not set.
+func (c *Config) isSet(key string) bool {
+	return c.IsSet(key) && c.GetString(key) != ""
 }

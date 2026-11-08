@@ -246,6 +246,8 @@ func TestGetOrDefault(t *testing.T) {
 		"test_duration": "2s",
 		"test_slice":    []string{"a", "b"},
 		"test_map":      map[string]any{"key": "value"},
+		"test_zero_int": 0,
+		"test_zero_dur": "0s",
 	}))
 	require.NoError(t, err)
 
@@ -260,6 +262,11 @@ func TestGetOrDefault(t *testing.T) {
 	assert.InDelta(t, 3.0, cfg.GetFloat64OrDefault("test_missing", 3), 0)
 	assert.Equal(t, 2*time.Second, cfg.GetDurationOrDefault("test_duration", time.Minute))
 	assert.Equal(t, time.Minute, cfg.GetDurationOrDefault("test_missing", time.Minute))
+	assert.Equal(t, time.Minute, cfg.GetDurationOrDefault("test_empty", time.Minute))
+	// An explicit zero is kept: it can mean "none" or "unlimited".
+	assert.Equal(t, 0, cfg.GetIntOrDefault("test_zero_int", 3))
+	assert.Equal(t, time.Duration(0), cfg.GetDurationOrDefault("test_zero_dur", time.Minute))
+	assert.InDelta(t, 0.0, cfg.GetFloat64OrDefault("test_zero_int", 3), 0)
 	assert.Equal(t, []string{"a", "b"}, cfg.GetStringSliceOrDefault("test_slice", []string{"c"}))
 	assert.Equal(t, []string{"c"}, cfg.GetStringSliceOrDefault("test_missing", []string{"c"}))
 	assert.Equal(t, map[string]string{"key": "value"}, cfg.GetStringMapStringOrDefault("test_map", nil))
