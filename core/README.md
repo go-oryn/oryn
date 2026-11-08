@@ -155,7 +155,7 @@ health.AsProbe(NewDatabaseProbe, health.Readiness, health.Startup)
 
 ## Testing
 
-`coretest` runs the application in the `test` environment, where all telemetry is exported in memory. Assert on it with the `oteltest` packages:
+`coretest` runs the application in the `test` environment, where all telemetry is exported in memory. Assert on it with the `otel/oteltest` packages (`logtest`, `spantest`, `metrictest`):
 
 ```go
 func TestGreet(t *testing.T) {

@@ -23,7 +23,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/go-oryn/oryn/core/config"
-	"github.com/go-oryn/oryn/core/oteltest/logtest"
+	"github.com/go-oryn/oryn/core/otel/oteltest/logtest"
 )
 
 // ModuleName is the name of the otel fx module.

@@ -18,9 +18,9 @@ import (
 	"go.opentelemetry.io/otel/sdk/trace/tracetest"
 	"go.opentelemetry.io/otel/trace"
 
-	"github.com/go-oryn/oryn/core/oteltest/logtest"
-	"github.com/go-oryn/oryn/core/oteltest/metrictest"
-	"github.com/go-oryn/oryn/core/oteltest/spantest"
+	"github.com/go-oryn/oryn/core/otel/oteltest/logtest"
+	"github.com/go-oryn/oryn/core/otel/oteltest/metrictest"
+	"github.com/go-oryn/oryn/core/otel/oteltest/spantest"
 )
 
 // recordingTB records the failures instead of failing the test.

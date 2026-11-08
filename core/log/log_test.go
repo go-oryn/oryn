@@ -15,7 +15,7 @@ import (
 	"github.com/go-oryn/oryn/core/config"
 	"github.com/go-oryn/oryn/core/coretest"
 	"github.com/go-oryn/oryn/core/log"
-	"github.com/go-oryn/oryn/core/oteltest/logtest"
+	"github.com/go-oryn/oryn/core/otel/oteltest/logtest"
 )
 
 // errorHandler is a [slog.Handler] failing on every record.

@@ -24,7 +24,7 @@ Go framework built on uber/fx, OpenTelemetry native. One Go module per top level
 - Extract shared setup into helpers calling `t.Helper()`, in the main `_test.go` file of the package.
 - Prefer `fstest.MapFS` for config fixtures; use `testdata/` for larger ones.
 - Use simple, descriptive fixture names (`test_string`, `test_value`).
-- Run applications with `coretest.Start`, and assert telemetry with the `oteltest` packages.
+- Run applications with `coretest.Start`, and assert telemetry with the `otel/oteltest` packages.
 
 ## Documentation
 

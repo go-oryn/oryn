@@ -22,9 +22,9 @@ import (
 	"github.com/go-oryn/oryn/core/config"
 	"github.com/go-oryn/oryn/core/coretest"
 	"github.com/go-oryn/oryn/core/otel"
-	"github.com/go-oryn/oryn/core/oteltest/logtest"
-	"github.com/go-oryn/oryn/core/oteltest/metrictest"
-	"github.com/go-oryn/oryn/core/oteltest/spantest"
+	"github.com/go-oryn/oryn/core/otel/oteltest/logtest"
+	"github.com/go-oryn/oryn/core/otel/oteltest/metrictest"
+	"github.com/go-oryn/oryn/core/otel/oteltest/spantest"
 )
 
 func newTestApp(t *testing.T, values map[string]any) core.App {
