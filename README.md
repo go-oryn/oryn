@@ -28,16 +28,16 @@ The documentation is written for humans and agents: the website is built from th
 
 Each module is a Go module of this repository, versioned and released independently.
 
-| Module | Description | Status |
-|---|---|---|
-| [core](core) | Runtime, configuration, OpenTelemetry, logging, health checks, test helpers | In progress |
-| [httpserver](httpserver) | HTTP server on `net/http`, with handlers, middlewares and handler groups registered through fx | In progress |
-| [grpcserver](grpcserver) | gRPC server, with services and interceptors registered through fx, health and reflection | In progress |
-| [mcpserver](mcpserver) | Model Context Protocol server, with tools, resources and prompts registered through fx | In progress |
-| [sql](sql) | `database/sql` pool to PostgreSQL, MySQL or SQLite, with migrations | In progress |
-| httpclient | Instrumented HTTP client | Planned |
-| grpcclient | Instrumented gRPC client connections | Planned |
-| worker, cron, validator | | Later |
+| Module | Description | Status | Coverage |
+|---|---|---|---|
+| [core](core) | Runtime, configuration, OpenTelemetry, logging, health checks, test helpers | In progress | [![core coverage](https://codecov.io/gh/go-oryn/oryn/graph/badge.svg?flag=core)](https://codecov.io/gh/go-oryn/oryn?flags%5B0%5D=core) |
+| [httpserver](httpserver) | HTTP server on `net/http`, with handlers, middlewares and handler groups registered through fx | In progress | [![httpserver coverage](https://codecov.io/gh/go-oryn/oryn/graph/badge.svg?flag=httpserver)](https://codecov.io/gh/go-oryn/oryn?flags%5B0%5D=httpserver) |
+| [grpcserver](grpcserver) | gRPC server, with services and interceptors registered through fx, health and reflection | In progress | [![grpcserver coverage](https://codecov.io/gh/go-oryn/oryn/graph/badge.svg?flag=grpcserver)](https://codecov.io/gh/go-oryn/oryn?flags%5B0%5D=grpcserver) |
+| [mcpserver](mcpserver) | Model Context Protocol server, with tools, resources and prompts registered through fx | In progress | [![mcpserver coverage](https://codecov.io/gh/go-oryn/oryn/graph/badge.svg?flag=mcpserver)](https://codecov.io/gh/go-oryn/oryn?flags%5B0%5D=mcpserver) |
+| [sql](sql) | `database/sql` pool to PostgreSQL, MySQL or SQLite, with migrations | In progress | [![sql coverage](https://codecov.io/gh/go-oryn/oryn/graph/badge.svg?flag=sql)](https://codecov.io/gh/go-oryn/oryn?flags%5B0%5D=sql) |
+| httpclient | Instrumented HTTP client | Planned |  |
+| grpcclient | Instrumented gRPC client connections | Planned |  |
+| worker, cron, validator | | Later |  |
 
 ```shell
 go get github.com/go-oryn/oryn/core
