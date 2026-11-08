@@ -10,8 +10,8 @@ Every layer of the demo produces telemetry, correlated in the same traces: the A
 The service gets the application tracer, meter and logger from the container, as an `otel.Telemetry`:
 
 ```go
-// tasks/service.go
-func NewService(repository *Repository, telemetry otel.Telemetry) (*Service, error) {
+// internal/tasks/service.go
+func NewService(store Store, telemetry otel.Telemetry) (*Service, error) {
 	created, err := telemetry.Meter().Int64Counter("tasks.created", metric.WithDescription("Number of created tasks"))
 	...
 }
@@ -27,7 +27,7 @@ func (s *Service) Create(ctx context.Context, title string) (Task, error) {
 
 	span.SetAttributes(TaskIDKey.String(task.ID))
 
-	if err := s.repository.Insert(ctx, task); err != nil {
+	if err := s.store.Insert(ctx, task); err != nil {
 		return Task{}, s.fail(span, err)
 	}
 
@@ -40,7 +40,7 @@ func (s *Service) Create(ctx context.Context, title string) (Task, error) {
 
 - Each operation has a span: `tasks.list`, `tasks.get`, `tasks.create`, `tasks.complete`, `tasks.delete`, with the `task.id` attribute.
 - Unexpected errors set the span status to `Error`. Expected ones (not found, invalid title) are only recorded as a `tasks.error` attribute: they are not failures of the service.
-- The context carries the span to the repository, so the SQL spans are its children, and to the logger, so the logs are correlated with it.
+- The context carries the span to the store, so the SQL spans are its children, and to the logger, so the logs are correlated with it.
 
 ## Traces
 

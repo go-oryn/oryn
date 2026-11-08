@@ -13,7 +13,7 @@ mcpserver:
   path: /mcp                  # path of the MCP endpoint
   stateless: false            # no sessions: every request is independent
   json_response: false        # answer with application/json instead of SSE streams
-  session_timeout: 30m        # idle sessions are closed after this duration
+  session_timeout: 30m        # idle sessions are closed after this duration, 0 = never
   read_header_timeout: 10s    # max duration to read the request headers
   log:
     enabled: true             # log every request
@@ -52,7 +52,7 @@ Once `mcpserver.Serve()` has started the server, the `*mcpserver.HTTPServer` Add
 
 ## Sessions
 
-By default, the server is stateful: a client opens a session (`Mcp-Session-Id` header), and the server keeps it until the client closes it, or until it has been idle for `session_timeout`. Idle sessions are always closed eventually: `0` means the default, `30m`.
+By default, the server is stateful: a client opens a session (`Mcp-Session-Id` header), and the server keeps it until the client closes it, or until it has been idle for `session_timeout`. With `session_timeout: 0s`, idle sessions are never closed.
 
 Stateful sessions are kept in memory: behind a load balancer, a client must reach the same instance. For several instances without sticky sessions, run stateless:
 

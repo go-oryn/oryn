@@ -126,6 +126,8 @@ health:
     address: ":8081"            # address of health.Serve()
 ```
 
+A default applies when a key is not set, or set to an empty value (like a placeholder expanding to nothing). An explicit `0` is kept: for durations and limits, it usually means "none" or "unlimited", see each key.
+
 Every key can be set with an environment variable: `APP_` followed by the key in upper case, with `_` instead of `.`, for example `APP_LOG_LEVEL=debug`. The standard `OTEL_*` variables win over the `otel.*` keys.
 
 Details: [OpenTelemetry](opentelemetry.md#standard-environment-variables-win), [Logging](opentelemetry.md#logging), [Health checks](health.md).

@@ -14,7 +14,7 @@ go test ./...
 `demotest.Start` starts the application with [coretest](../core/testing.md), and connects a client to each API:
 
 ```go
-// demotest/demotest.go
+// internal/demotest/demotest.go
 func Start(t *testing.T, options ...fx.Option) *App {
 	app := &App{t: t}
 
@@ -67,7 +67,7 @@ func TestService(t *testing.T) {
 Each API test calls the API, then checks that the `tasks.create` span is a child of the server span.
 
 ```go
-// httpapi/handlers_test.go
+// internal/http/handlers_test.go
 response := app.HTTP(http.MethodPost, "/api/tasks", `{"title": "test_title"}`)
 require.Equal(t, http.StatusCreated, response.Code)
 
@@ -76,7 +76,7 @@ spantest.HasSpan(t, app.Spans, spantest.WithName("tasks.create"), spantest.WithP
 ```
 
 ```go
-// grpcapi/service_test.go
+// internal/grpc/service_test.go
 task, err := app.GRPC.CreateTask(t.Context(), &tasksv1.CreateTaskRequest{Title: "test_title"})
 require.NoError(t, err)
 
@@ -87,7 +87,7 @@ server := spantest.Find(app.Spans, spantest.WithName("tasks.v1.TasksService/Crea
 ```
 
 ```go
-// mcpapi/tools_test.go
+// internal/mcp/tools_test.go
 result, err := app.MCP.CallTool(t.Context(), &mcp.CallToolParams{
 	Name:      "create_task",
 	Arguments: mcpapi.CreateInput{Title: "test_title"},
@@ -97,5 +97,51 @@ assert.False(t, result.IsError)
 
 server := spantest.Find(app.Spans, spantest.WithName("tools/call create_task"))
 ```
+
+## Replace dependencies with fx.Replace
+
+The `tasks.Service` depends on a `tasks.Store` interface, provided by the SQL `Repository`:
+
+```go
+// internal/tasks/module.go
+var Module = fx.Module("tasks",
+	fx.Provide(
+		fx.Annotate(NewRepository, fx.As(new(Store))),
+		NewService,
+	),
+)
+```
+
+Tests replace it with [fx.Replace](https://pkg.go.dev/go.uber.org/fx#Replace), here with a store failing every call, to check how each API handles an unexpected error. The rest of the application is unchanged:
+
+```go
+// internal/demotest/demotest.go
+func ReplaceStore(store tasks.Store) fx.Option {
+	return fx.Replace(fx.Annotate(store, fx.As(new(tasks.Store))))
+}
+```
+
+```go
+// internal/http/handlers_test.go
+app := demotest.Start(t, demotest.ReplaceStore(demotest.FailingStore{}))
+
+response := app.HTTP(http.MethodGet, "/api/tasks", "")
+assert.Equal(t, http.StatusInternalServerError, response.Code)
+assert.JSONEq(t, `{"error": "internal error"}`, response.Body.String(), "the error is not exposed")
+
+spantest.HasSpan(t, app.Spans, spantest.WithName("GET /api/tasks"), spantest.WithStatus(codes.Error))
+logtest.HasRecord(t, app.Logs, logtest.WithBody("tasks request failed"), logtest.WithLevel(slog.LevelError))
+```
+
+The same failure is tested on every surface:
+
+| Surface | Result |
+|---|---|
+| `tasks.Service` | the error, a `tasks.create` span with an `Error` status, no `tasks.created` count |
+| HTTP | `500`, without the error details, and an error log |
+| gRPC | `INTERNAL`, a failed server span, and an error log |
+| MCP | a tool error, with `error.type=tool_error`, and an error log |
+
+Replace any provided dependency the same way: a clock, an HTTP client, a fake of a third party API.
 
 The requests go through the whole servers, with their instrumentation, middlewares and interceptors: the same code as in production, without ports. See the testing pages of [httpserver](../httpserver/testing.md), [grpcserver](../grpcserver/testing.md) and [mcpserver](../mcpserver/testing.md).

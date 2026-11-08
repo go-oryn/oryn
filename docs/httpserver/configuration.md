@@ -10,10 +10,10 @@ The `httpserver.*` keys configure the HTTP server. All of them are optional.
 ```yaml
 httpserver:
   address: ":8080"            # listen address
-  read_header_timeout: 10s    # max duration to read the request headers
+  read_header_timeout: 10s    # max duration to read the request headers, 0 = read_timeout
   read_timeout: 0s            # max duration to read the whole request, 0 = none
   write_timeout: 0s           # max duration to write the response, 0 = none
-  idle_timeout: 2m            # max duration of an idle keep-alive connection
+  idle_timeout: 2m            # max duration of an idle keep-alive connection, 0 = read_timeout
   log:
     enabled: true             # log every request
   observability:
@@ -30,7 +30,7 @@ httpserver:
 | `httpserver.log.enabled` | bool | `true` | `APP_HTTPSERVER_LOG_ENABLED` |
 | `httpserver.observability.exclude` | list | `[]` | |
 
-Durations use the Go syntax: `500ms`, `30s`, `2m`. For the keys with a default, `0s` means the default.
+Durations use the Go syntax: `500ms`, `30s`, `2m`. `0s` disables a timeout: like in `net/http`, a disabled `read_header_timeout` or `idle_timeout` falls back to `read_timeout`.
 
 ## Address
 

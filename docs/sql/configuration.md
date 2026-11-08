@@ -12,7 +12,7 @@ sql:
   driver: postgres            # postgres, mysql or sqlite (required)
   dsn: postgres://app:${DATABASE_PASSWORD}@localhost:5432/app   # data source name (required)
   max_open_conns: 0           # max open connections, 0 = unlimited
-  max_idle_conns: 2           # max idle connections kept in the pool
+  max_idle_conns: 2           # max idle connections kept in the pool, 0 = none
   conn_max_lifetime: 0s       # max lifetime of a connection, 0 = unlimited
   conn_max_idle_time: 0s      # max idle time of a connection, 0 = unlimited
   ping_on_start: true         # fail the application start if the database is unreachable
@@ -25,7 +25,7 @@ sql:
 | `sql.driver` | string | required | `APP_SQL_DRIVER` |
 | `sql.dsn` | string | required | `APP_SQL_DSN` |
 | `sql.max_open_conns` | int | `0` (unlimited) | `APP_SQL_MAX_OPEN_CONNS` |
-| `sql.max_idle_conns` | int | `2` | `APP_SQL_MAX_IDLE_CONNS` |
+| `sql.max_idle_conns` | int | `2` (`0` = none) | `APP_SQL_MAX_IDLE_CONNS` |
 | `sql.conn_max_lifetime` | duration | `0s` (unlimited) | `APP_SQL_CONN_MAX_LIFETIME` |
 | `sql.conn_max_idle_time` | duration | `0s` (unlimited) | `APP_SQL_CONN_MAX_IDLE_TIME` |
 | `sql.ping_on_start` | bool | `true` | `APP_SQL_PING_ON_START` |

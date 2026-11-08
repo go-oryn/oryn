@@ -3,7 +3,7 @@ title: APIs
 description: The HTTP, gRPC and MCP APIs of the demo, three thin layers registered on the same tasks service, and how to call them.
 ---
 
-Each API is a package with its own fx module. It depends on the `*tasks.Service`, maps the requests to it, and maps the `tasks.ErrNotFound` and `tasks.ErrInvalidTitle` errors to its protocol:
+Each API is a package of `internal/` with its own fx module: `internal/http` (package `httpapi`), `internal/grpc` (`grpcapi`) and `internal/mcp` (`mcpapi`), named so they do not collide with the `net/http`, gRPC and MCP SDK packages they import. It depends on the `*tasks.Service`, maps the requests to it, and maps the `tasks.ErrNotFound` and `tasks.ErrInvalidTitle` errors to its protocol:
 
 | Error | HTTP | gRPC | MCP |
 |---|---|---|---|
@@ -14,7 +14,7 @@ Each API is a package with its own fx module. It depends on the `*tasks.Service`
 ## HTTP
 
 ```go
-// httpapi/module.go
+// internal/http/module.go
 var Module = fx.Module("httpapi",
 	httpserver.AsMiddleware(TraceIDMiddleware),
 	httpserver.AsHandlerGroup("/api",
@@ -27,7 +27,7 @@ var Module = fx.Module("httpapi",
 	),
 )
 
-// httpapi/handlers.go
+// internal/http/handlers.go
 func NewCreateHandler(service *tasks.Service, logger *slog.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var request createRequest
@@ -56,7 +56,7 @@ The `TraceIDMiddleware` adds an `X-Trace-Id` header to every response: the ID of
 The service is defined in `proto/tasks/v1/tasks.proto`. The generated code is committed; `go generate ./proto` regenerates it with [protoc](https://protobuf.dev/installation/) and the plugins declared as `tool` dependencies in `go.mod`.
 
 ```go
-// grpcapi/service.go
+// internal/grpc/service.go
 var Module = fx.Module("grpcapi",
 	grpcserver.AsService(&tasksv1.TasksService_ServiceDesc, NewTasksService),
 )
@@ -92,7 +92,7 @@ See [gRPC server](../grpcserver/overview.md).
 The tools are typed: their input and output JSON schemas are inferred from the Go types.
 
 ```go
-// mcpapi/tools.go
+// internal/mcp/tools.go
 var Module = fx.Module("mcpapi",
 	mcpserver.AsCapability(NewTools),
 )
