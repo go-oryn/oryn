@@ -2,6 +2,7 @@ package core_test
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"testing"
 	"testing/fstest"
@@ -105,5 +106,56 @@ func TestApp(t *testing.T) {
 		)
 
 		assert.True(t, stopped)
+	})
+}
+
+func TestRunOnce(t *testing.T) {
+	t.Parallel()
+
+	// hooks records the lifecycle hooks run by the application.
+	hooks := func(calls *[]string, startErr error) fx.Option {
+		return fx.Invoke(func(lc fx.Lifecycle) {
+			lc.Append(fx.Hook{
+				OnStart: func(context.Context) error {
+					*calls = append(*calls, "start")
+
+					return startErr
+				},
+				OnStop: func(context.Context) error {
+					*calls = append(*calls, "stop")
+
+					return nil
+				},
+			})
+		})
+	}
+
+	t.Run("starts then stops", func(t *testing.T) {
+		t.Parallel()
+
+		var calls []string
+
+		core.New().RunOnce(coretest.TestOptions(), fx.NopLogger, hooks(&calls, nil))
+
+		assert.Equal(t, []string{"start", "stop"}, calls)
+	})
+
+	t.Run("start failure", func(t *testing.T) {
+		t.Parallel()
+
+		var calls []string
+
+		err := core.New().RunOnceErr(coretest.TestOptions(), fx.NopLogger, hooks(&calls, errors.New("test_error")))
+
+		require.ErrorContains(t, err, "test_error")
+		assert.Equal(t, []string{"start"}, calls)
+	})
+
+	t.Run("build failure", func(t *testing.T) {
+		t.Parallel()
+
+		err := core.New(fx.Invoke(func(string) {})).RunOnceErr(coretest.TestOptions(), fx.NopLogger)
+
+		require.ErrorContains(t, err, "missing type: string")
 	})
 }

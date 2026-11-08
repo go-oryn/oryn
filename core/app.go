@@ -13,8 +13,10 @@ package core
 
 import (
 	"context"
+	"fmt"
 	"io/fs"
 	"log/slog"
+	"os"
 
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxevent"
@@ -90,6 +92,36 @@ func (a App) Build(options ...fx.Option) *fx.App {
 // shutdown signal (SIGINT, SIGTERM) and stops it. It exits the process on failure.
 func (a App) Run(options ...fx.Option) {
 	a.Build(options...).Run()
+}
+
+// RunOnce builds and starts the application, then stops it right away: for one-shot
+// commands, like applying database migrations, whose work is done by start hooks.
+// It exits the process on failure.
+func (a App) RunOnce(options ...fx.Option) {
+	if err := a.runOnce(options...); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+}
+
+// runOnce starts then stops the application, returning the first error.
+func (a App) runOnce(options ...fx.Option) error {
+	app := a.Build(options...)
+	if err := app.Err(); err != nil {
+		return err
+	}
+
+	startCtx, cancelStart := context.WithTimeout(a.ctx, app.StartTimeout())
+	defer cancelStart()
+
+	if err := app.Start(startCtx); err != nil {
+		return err
+	}
+
+	stopCtx, cancelStop := context.WithTimeout(context.WithoutCancel(a.ctx), app.StopTimeout())
+	defer cancelStop()
+
+	return app.Stop(stopCtx)
 }
 
 // WithConfigFS loads the config files of fsys, see [config.WithFS].

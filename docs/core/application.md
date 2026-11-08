@@ -25,6 +25,8 @@ func main() {
 - `core.WithConfigFS(fsys)` loads the configuration files of `fsys`, see [Configuration](configuration.md).
 - `Run(options...)` starts the application with the extra options, blocks until `SIGINT` or `SIGTERM`, then stops it gracefully. It exits the process if the application fails to start.
 
+- `RunOnce(options...)` starts the application then stops it right away, for one-shot commands whose work is done by start hooks, like `sql.Migrate()`. It exits the process on failure.
+
 Options passed to `Run` are the things that run with the application, like servers: `httpserver.Serve()`, `health.Serve()`. Modules never start anything by themselves, so tests can use the same modules without opening ports.
 
 `core.App` is immutable: `WithOptions(options...)` and `WithContext(ctx)` return a copy, so an `App` can be shared, for example between `main` and the tests.
@@ -36,7 +38,33 @@ Options passed to `Run` are the things that run with the application, like serve
 | `WithContext(ctx)` | Returns a copy using `ctx` as base context, injected as `context.Context` |
 | `Build(options...)` | Returns the `*fx.App`, without starting it |
 | `Run(options...)` | Builds, starts, and waits for a shutdown signal |
+| `RunOnce(options...)` | Builds, starts, then stops right away |
 | `Options(options...)` | Returns all the fx options, to build an `fx.App` yourself |
+
+## Several entrypoints
+
+Share one `App` between several commands, each running it with its own options. For example, with one `main` package per command in `cmd/`:
+
+```go
+// app.go: the application, shared by the commands and the tests.
+var App = core.New(core.WithConfigFS(configs.FS), httpserver.Module, sql.Module, sql.AsMigrations(migrations.FS), users.Module)
+```
+
+```go
+// cmd/serve/main.go: go run ./cmd/serve
+func main() {
+	app.App.Run(health.Serve(), httpserver.Serve())
+}
+```
+
+```go
+// cmd/migrate/main.go: go run ./cmd/migrate
+func main() {
+	app.App.RunOnce(sql.Migrate())
+}
+```
+
+The [demo application](../demo/overview.md) is organized this way.
 
 ## Organize the code in modules
 
