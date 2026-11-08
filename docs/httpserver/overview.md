@@ -30,23 +30,4 @@ func main() {
 
 ## Configuration
 
-```yaml
-httpserver:
-  # Listen address.
-  address: ":8080"                # default ":8080"
-  # Server timeouts. 0 disables a timeout.
-  read_header_timeout: 10s        # default 10s
-  read_timeout: 0s                # default 0s
-  write_timeout: 0s               # default 0s
-  idle_timeout: 2m                # default 2m
-  log:
-    # Log every request.
-    enabled: true                 # default true
-  observability:
-    # Go regular expressions matched against the request path, excluded from spans, metrics and request logs.
-    exclude:                      # default []
-      - "^/livez$"
-      - "^/readyz$"
-```
-
-Like every key, they can be set with environment variables: `APP_HTTPSERVER_ADDRESS=:9090`.
+The `httpserver.*` keys set the address, the timeouts, the request logs and the paths excluded from telemetry. See [Configuration](configuration.md).

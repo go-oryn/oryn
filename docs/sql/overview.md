@@ -74,22 +74,4 @@ Every query is traced and measured, see [Observability](observability.md).
 
 ## Configuration
 
-```yaml
-sql:
-  # Database: postgres, mysql or sqlite. Required.
-  driver: postgres
-  # Data source name, see the driver documentation. Required.
-  dsn: postgres://app:${DATABASE_PASSWORD}@localhost:5432/app
-  # Pool settings, see database/sql. 0 means unlimited.
-  max_open_conns: 0           # default 0
-  max_idle_conns: 2           # default 2
-  conn_max_lifetime: 0s       # default 0s
-  conn_max_idle_time: 0s      # default 0s
-  # Ping the database when the application starts.
-  ping_on_start: true         # default true
-  observability:
-    # Record the query text in the spans.
-    query: true               # default true
-```
-
-Keep secrets out of the files with [placeholders](../core/configuration.md#environment-variable-placeholders), like `${DATABASE_PASSWORD}`, or set the whole DSN with `APP_SQL_DSN`.
+The `sql.*` keys set the database, the pool, the ping on start and the query text in spans. See [Configuration](configuration.md).

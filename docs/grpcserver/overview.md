@@ -122,30 +122,4 @@ conn, err := grpc.NewClient(address.String(), grpc.WithTransportCredentials(inse
 
 ## Configuration
 
-```yaml
-grpcserver:
-  # Listen address.
-  address: ":50051"               # default ":50051"
-  # Maximum size of the received and sent messages, in bytes. 0 is the gRPC default (4MB received, unlimited sent).
-  max_recv_msg_size: 0            # default 0
-  max_send_msg_size: 0            # default 0
-  health:
-    # Register the gRPC health service.
-    enabled: true                 # default true
-  reflection:
-    # Register the server reflection.
-    enabled: false                # default false
-  log:
-    # Log every call.
-    enabled: true                 # default true
-  observability:
-    # Full methods excluded from spans, metrics and call logs. A list replaces the default.
-    exclude:                      # default: the health and reflection methods
-      - /grpc.health.v1.Health/Check
-      - /grpc.health.v1.Health/Watch
-      - /grpc.health.v1.Health/List
-      - /grpc.reflection.v1.ServerReflection/ServerReflectionInfo
-      - /grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo
-```
-
-Like every key, they can be set with environment variables: `APP_GRPCSERVER_ADDRESS=:9090`.
+The `grpcserver.*` keys set the address, the message sizes, the health service, the reflection, the call logs and the methods excluded from telemetry. See [Configuration](configuration.md).

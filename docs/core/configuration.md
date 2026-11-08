@@ -84,10 +84,57 @@ Options apply in registration order: when two set the same key, the last registe
 
 ## Keys
 
-Every module documents its keys, namespaced by module:
+Keys are namespaced by module. The core keys, with their defaults:
 
-- `app.*`: [Application](application.md) identity, also used by [OpenTelemetry](opentelemetry.md)
-- `otel.*`: [OpenTelemetry](opentelemetry.md)
-- `log.*`: [Logging](opentelemetry.md#logging)
-- `health.*`: [Health checks](health.md)
-- `httpserver.*`: [HTTP server configuration](../httpserver/overview.md#configuration)
+```yaml
+app:
+  name: app                     # service name, OTEL_SERVICE_NAME wins
+  version: 0.0.0                # service version
+
+log:
+  level: info                   # debug, info, warn or error
+  source: false                 # add the source code location
+  set_default: true             # set the logger as slog.Default
+  console:
+    enabled: false              # also print the logs on stdout
+    format: text                # text or json
+
+otel:
+  disabled: false               # disable the SDK, OTEL_SDK_DISABLED wins
+  propagators: [tracecontext, baggage]
+  resource:
+    attributes: {}              # extra resource attributes
+  traces:
+    exporter: otlp              # otlp, console, memory or none
+    sampler: parentbased_always_on
+    sampler_arg: 1
+  metrics:
+    exporter: otlp
+    interval: 60s               # export interval
+    runtime: true               # Go runtime metrics, false in tests
+  logs:
+    exporter: otlp
+  exporter:
+    otlp:
+      protocol: http/protobuf   # http/protobuf or grpc
+      endpoint: http://localhost:4318
+      headers: {}
+
+health:
+  timeout: 5s                   # max duration of a check
+  server:
+    address: ":8081"            # address of health.Serve()
+```
+
+Every key can be set with an environment variable: `APP_` followed by the key in upper case, with `_` instead of `.`, for example `APP_LOG_LEVEL=debug`. The standard `OTEL_*` variables win over the `otel.*` keys.
+
+Details: [OpenTelemetry](opentelemetry.md#standard-environment-variables-win), [Logging](opentelemetry.md#logging), [Health checks](health.md).
+
+The other modules document their keys on their Configuration page:
+
+| Keys | Page |
+|---|---|
+| `httpserver.*` | [HTTP server configuration](../httpserver/configuration.md) |
+| `grpcserver.*` | [gRPC server configuration](../grpcserver/configuration.md) |
+| `mcpserver.*` | [MCP server configuration](../mcpserver/configuration.md) |
+| `sql.*` | [SQL configuration](../sql/configuration.md) |

@@ -123,28 +123,4 @@ npx @modelcontextprotocol/inspector
 
 ## Configuration
 
-```yaml
-mcpserver:
-  # Listen address.
-  address: ":8082"                # default ":8082"
-  # Path of the MCP endpoint.
-  path: /mcp                      # default /mcp
-  # Stateless mode: no session, every request is independent.
-  stateless: false                # default false
-  # Answer with application/json instead of server-sent event streams.
-  json_response: false            # default false
-  # Idle sessions are closed after this duration. 0 never closes them.
-  session_timeout: 30m            # default 30m
-  read_header_timeout: 10s        # default 10s
-  log:
-    # Log every request.
-    enabled: true                 # default true
-  observability:
-    # MCP methods excluded from spans, metrics and request logs.
-    exclude:                      # default []
-      - ping
-```
-
-Like every key, they can be set with environment variables: `APP_MCPSERVER_ADDRESS=:9092`.
-
-The server name and version sent to the clients are `app.name` and `app.version`.
+The `mcpserver.*` keys set the address and path, the session mode, the response format, the request logs and the methods excluded from telemetry. See [Configuration](configuration.md).

@@ -50,6 +50,7 @@ export default defineConfig({
 							label: 'HTTP server',
 							items: [
 								{ label: 'Overview', slug: 'httpserver/overview' },
+								'httpserver/configuration',
 								'httpserver/routing',
 								'httpserver/observability',
 								'httpserver/testing',
@@ -59,6 +60,7 @@ export default defineConfig({
 							label: 'gRPC server',
 							items: [
 								{ label: 'Overview', slug: 'grpcserver/overview' },
+								'grpcserver/configuration',
 								'grpcserver/observability',
 								'grpcserver/testing',
 							],
@@ -67,6 +69,7 @@ export default defineConfig({
 							label: 'MCP server',
 							items: [
 								{ label: 'Overview', slug: 'mcpserver/overview' },
+								'mcpserver/configuration',
 								'mcpserver/observability',
 								'mcpserver/testing',
 							],
@@ -75,6 +78,7 @@ export default defineConfig({
 							label: 'SQL',
 							items: [
 								{ label: 'Overview', slug: 'sql/overview' },
+								'sql/configuration',
 								'sql/migrations',
 								'sql/observability',
 								'sql/testing',
