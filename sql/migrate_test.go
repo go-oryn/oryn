@@ -7,10 +7,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/sdk/trace/tracetest"
 	"go.uber.org/fx"
 
 	"github.com/go-oryn/oryn/core/coretest"
 	"github.com/go-oryn/oryn/core/otel/oteltest/logtest"
+	"github.com/go-oryn/oryn/core/otel/oteltest/spantest"
 	"github.com/go-oryn/oryn/sql"
 )
 
@@ -37,17 +40,23 @@ func TestMigrate(t *testing.T) {
 		t.Parallel()
 
 		var (
-			db   *stdsql.DB
-			logs *logtest.InMemoryExporter
+			db    *stdsql.DB
+			logs  *logtest.InMemoryExporter
+			spans *tracetest.InMemoryExporter
 		)
 
-		coretest.Start(t, newApp(sqliteValues(t), sql.AsMigrations(newMigrations())), sql.Migrate(), fx.Populate(&db, &logs))
+		coretest.Start(t, newApp(sqliteValues(t), sql.AsMigrations(newMigrations())), sql.Migrate(), fx.Populate(&db, &logs, &spans))
 
 		var name string
 		require.NoError(t, db.QueryRowContext(t.Context(), "SELECT name FROM users").Scan(&name))
 		assert.Equal(t, "test_user", name)
 
 		logtest.HasRecord(t, logs, logtest.WithBody("database migrated"), logtest.WithAttributeValue("applied", "2"))
+
+		// The migration queries are grouped in one trace.
+		migrate := spantest.Find(spans, spantest.WithName("sql.migrate"), spantest.WithAttributeValue(attribute.Int("sql.migrations.applied", 2)))
+		require.Len(t, migrate, 1)
+		spantest.HasSpan(t, spans, spantest.WithName("INSERT"), spantest.WithParent(migrate[0].SpanContext.SpanID()))
 	})
 
 	t.Run("applies only the pending migrations", func(t *testing.T) {

@@ -9,6 +9,9 @@ import (
 	"log/slog"
 
 	"github.com/pressly/goose/v3"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/fx"
 )
 
@@ -32,11 +35,12 @@ func AsMigrations(fsys fs.FS) fx.Option {
 type MigrateParams struct {
 	fx.In
 
-	Lifecycle  fx.Lifecycle
-	Driver     Driver
-	Logger     *slog.Logger
-	DB         *stdsql.DB
-	Migrations []fs.FS `group:"oryn-sql-migrations"`
+	Lifecycle      fx.Lifecycle
+	Driver         Driver
+	Logger         *slog.Logger
+	TracerProvider trace.TracerProvider
+	DB             *stdsql.DB
+	Migrations     []fs.FS `group:"oryn-sql-migrations"`
 }
 
 // Migrate applies the pending migrations registered with [AsMigrations] when the application
@@ -59,11 +63,21 @@ func Migrate() fx.Option {
 			return fmt.Errorf("cannot load the migrations: %w", err)
 		}
 
+		tracer := params.TracerProvider.Tracer("github.com/go-oryn/oryn/sql")
+
 		params.Lifecycle.Append(fx.StartHook(func(ctx context.Context) error {
+			// One trace for the whole migration, instead of one per query.
+			ctx, span := tracer.Start(ctx, "sql.migrate")
+			defer span.End()
+
 			results, err := provider.Up(ctx)
 			if err != nil {
+				span.SetStatus(codes.Error, err.Error())
+
 				return fmt.Errorf("cannot apply the migrations: %w", err)
 			}
+
+			span.SetAttributes(attribute.Int("sql.migrations.applied", len(results)))
 
 			params.Logger.InfoContext(ctx, "database migrated", "applied", len(results))
 

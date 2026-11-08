@@ -9,13 +9,16 @@ The [go-oryn/demo](https://github.com/go-oryn/demo) repository is a small but co
 
 | Feature | Where |
 |---|---|
-| Handler group with a middleware, and a global middleware | `tasks/module.go` |
+| Application assembled from modules | `app.go` |
+| Migrations applied, then health and HTTP servers started | `main.go` |
+| Handler group with a middleware, and a global middleware | `tasks/module.go`, `tasks/middleware.go` |
 | Handlers and a repository built by fx, with their dependencies | `tasks/` |
-| SQL queries traced, migrations applied on start | `tasks/repository.go`, `migrations/` |
+| SQL queries traced, migrations embedded | `tasks/repository.go`, `migrations/` |
 | Custom span attributes, metric and logs | `tasks/repository.go` |
-| Health checks, with the database probe | `main.go` |
 | Configuration per environment | `configs/` |
-| Tests asserting responses, spans and logs, in memory | `tasks/handlers_test.go` |
+| Tests asserting responses, spans and logs, in memory | `app_test.go` |
+
+The queries use `$1` placeholders, so the demo runs on SQLite and PostgreSQL.
 
 ## Run it
 

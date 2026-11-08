@@ -57,7 +57,7 @@ func main() {
 }
 ```
 
-When the application starts, the pending migrations are applied, in order, before the servers start: requests never hit an outdated schema. Applied migrations are recorded in the `goose_db_version` table. The application fails to start if a migration fails, and the `database migrated` log tells how many were applied.
+When the application starts, the pending migrations are applied, in order, before the servers start: requests never hit an outdated schema. Applied migrations are recorded in the `goose_db_version` table. The application fails to start if a migration fails, and the `database migrated` log tells how many were applied. The migration queries are traced under a single `sql.migrate` span, with a `sql.migrations.applied` attribute.
 
 - Register one migrations file system, with the files at its root.
 - With several instances of the application, migrations may run concurrently: prefer running them from a single instance, or a dedicated job running the application with `sql.Migrate()` only.
