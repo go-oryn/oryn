@@ -12,8 +12,16 @@
       "component": "core",
       "initial-version": "0.1.0"
     },
+    "grpcserver": {
+      "component": "grpcserver",
+      "initial-version": "0.1.0"
+    },
     "httpserver": {
       "component": "httpserver",
+      "initial-version": "0.1.0"
+    },
+    "mcpserver": {
+      "component": "mcpserver",
       "initial-version": "0.1.0"
     },
     "sql": {

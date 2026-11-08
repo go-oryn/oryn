@@ -32,11 +32,12 @@ Each module is a Go module of this repository, versioned and released independen
 |---|---|---|
 | [core](core) | Runtime, configuration, OpenTelemetry, logging, health checks, test helpers | In progress |
 | [httpserver](httpserver) | HTTP server on `net/http`, with handlers, middlewares and handler groups registered through fx | In progress |
+| [grpcserver](grpcserver) | gRPC server, with services and interceptors registered through fx, health and reflection | In progress |
+| [mcpserver](mcpserver) | Model Context Protocol server, with tools, resources and prompts registered through fx | In progress |
 | [sql](sql) | `database/sql` pool to PostgreSQL, MySQL or SQLite, with migrations | In progress |
 | httpclient | Instrumented HTTP client | Planned |
-| grpcserver | gRPC server, with services and interceptors registered through fx | Planned |
 | grpcclient | Instrumented gRPC client connections | Planned |
-| worker, cron, validator, mcpserver | | Later |
+| worker, cron, validator | | Later |
 
 ```shell
 go get github.com/go-oryn/oryn/core

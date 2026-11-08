@@ -10,7 +10,7 @@ Go framework built on uber/fx, OpenTelemetry native. One Go module per top level
 - Things that run with the application (servers, workers) are started by a `Serve()` / `Run...()` option invoking lifecycle hooks, never by `Module` itself.
 - Instrumentation libraries get the providers (`trace.TracerProvider`, `metric.MeterProvider`, `propagation.TextMapPropagator`) from the container, never the globals, and use their own instrumentation scope.
 - A standard `OTEL_*` environment variable always wins over the equivalent `otel.*` config key.
-- Config keys are namespaced by module (`httpserver.address`), documented in the module README.
+- Config keys are namespaced by module (`httpserver.address`), documented in the module docs page (`docs/<module>/overview.md`).
 - No business or company specific code.
 
 ## Go testing guidelines

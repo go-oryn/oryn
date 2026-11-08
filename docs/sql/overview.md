@@ -70,12 +70,7 @@ The drivers are included in the module: there is nothing else to import. Query p
 
 ## Observability
 
-The pool is instrumented with [otelsql](https://github.com/XSAM/otelsql), with the providers of the application:
-
-- **Traces**: a client span per query, named after the operation (`SELECT`, `INSERT`...), with `db.system.name`, `db.operation.name` and the query text in `db.query.text`. Transactions get `sql.conn.begin_tx`, `sql.tx.commit`... spans.
-- **Metrics**: the query duration (`db.client.operation.duration`), and the pool statistics (`db.sql.connection.open`, `db.sql.connection.max_open`, `db.sql.connection.wait`...).
-
-The query text holds the SQL with its placeholders, not the arguments. Disable it with `sql.observability.query: false`.
+Every query is traced and measured, see [Observability](observability.md).
 
 ## Configuration
 

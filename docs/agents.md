@@ -25,13 +25,14 @@ before writing code, and follow the conventions of the oryn documentation.
 ## Rules for writing oryn code
 
 - **Assemble the application with modules.** Start from `core.New(...)`, add the modules you need (`httpserver.Module`...), and group the application code in your own `fx.Options` modules.
-- **Register, do not wire.** Use the `AsXxx` helpers to add handlers, middlewares, probes, log handlers, config options or OpenTelemetry options: `httpserver.AsHandler`, `httpserver.AsMiddleware`, `health.AsProbe`, `log.AsHandler`, `config.AsOptions`, `otel.AsTracerProviderOptions`...
+- **Register, do not wire.** Use the `AsXxx` helpers to add handlers, services, tools, middlewares, probes, log handlers, config options or OpenTelemetry options: `httpserver.AsHandler`, `grpcserver.AsService`, `mcpserver.AsCapability`, `httpserver.AsMiddleware`, `health.AsProbe`, `log.AsHandler`, `config.AsOptions`, `otel.AsTracerProviderOptions`...
 - **Inject dependencies in constructors.** A handler, middleware or probe can be given as a constructor: its parameters (`*config.Config`, `*slog.Logger`, `otel.Telemetry`, your services...) are injected by fx.
-- **Start servers explicitly.** Modules never start anything by themselves: pass `httpserver.Serve()` or `health.Serve()` to `Run`.
+- **Start servers explicitly.** Modules never start anything by themselves: pass `httpserver.Serve()`, `grpcserver.Serve()`, `mcpserver.Serve()` or `health.Serve()` to `Run`, and one-shot work like `sql.Migrate()` to `RunOnce`.
+- **Keep the APIs thin.** Put the business rules and their telemetry in a domain module, and expose it through HTTP handlers, gRPC services or MCP tools that only map requests and errors, like the [demo](demo/overview.md).
 - **Configure with keys, not code.** Configuration keys are namespaced by module (`httpserver.address`, `log.level`...) and documented on each module page. Put them in YAML files, per environment.
 - **Do not configure OpenTelemetry globally.** Use the providers from the container, and let the standard `OTEL_*` variables configure the exporters.
 - **Log with the context.** Use the `...Context` methods of `*slog.Logger` (`InfoContext`...) so logs are correlated with the active span.
-- **Test with coretest.** Start the application with `coretest.Start`, serve HTTP requests with `httptest`, and assert telemetry with the `oteltest` packages. Tests run in memory: no network, no collector.
+- **Test with coretest.** Start the application with `coretest.Start`, call it in memory (`httptest`, `grpcservertest.Dial`, `mcpservertest.Connect`), and assert telemetry with the `oteltest` packages. Tests run in memory: no network, no collector.
 
 ## Check your work
 

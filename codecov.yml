@@ -25,9 +25,15 @@ flag_management:
     - name: core
       paths:
         - core/
+    - name: grpcserver
+      paths:
+        - grpcserver/
     - name: httpserver
       paths:
         - httpserver/
+    - name: mcpserver
+      paths:
+        - mcpserver/
     - name: sql
       paths:
         - sql/

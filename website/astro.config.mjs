@@ -27,7 +27,17 @@ export default defineConfig({
 			sidebar: [
 				{
 					label: 'Start here',
-					items: [{ label: 'Overview', slug: 'index' }, 'getting-started', 'demo', 'agents'],
+					items: [{ label: 'Overview', slug: 'index' }, 'getting-started', 'agents'],
+				},
+				{
+					label: 'Demo',
+					items: [
+						{ label: 'Overview', slug: 'demo/overview' },
+						'demo/entrypoints',
+						'demo/apis',
+						'demo/telemetry',
+						'demo/testing',
+					],
 				},
 				{
 					label: 'Modules',
@@ -46,8 +56,29 @@ export default defineConfig({
 							],
 						},
 						{
+							label: 'gRPC server',
+							items: [
+								{ label: 'Overview', slug: 'grpcserver/overview' },
+								'grpcserver/observability',
+								'grpcserver/testing',
+							],
+						},
+						{
+							label: 'MCP server',
+							items: [
+								{ label: 'Overview', slug: 'mcpserver/overview' },
+								'mcpserver/observability',
+								'mcpserver/testing',
+							],
+						},
+						{
 							label: 'SQL',
-							items: [{ label: 'Overview', slug: 'sql/overview' }, 'sql/migrations', 'sql/testing'],
+							items: [
+								{ label: 'Overview', slug: 'sql/overview' },
+								'sql/migrations',
+								'sql/observability',
+								'sql/testing',
+							],
 						},
 					],
 				},
@@ -56,8 +87,8 @@ export default defineConfig({
 				starlightLlmsTxt({
 					projectName: 'oryn',
 					details: [
-						'- oryn is a Go framework: applications are assembled from modules (core, httpserver, sql...) with uber/fx dependency injection.',
-						'- A complete example application: https://github.com/go-oryn/demo',
+						'- oryn is a Go framework: applications are assembled from modules (core, httpserver, grpcserver, mcpserver, sql) with uber/fx dependency injection.',
+						'- A complete example application, serving one domain module over HTTP, gRPC and MCP: https://github.com/go-oryn/demo',
 						'- Extension points are `AsXxx` helpers (e.g. `httpserver.AsHandler`, `health.AsProbe`) taking values or fx constructors.',
 						'- Every module is instrumented with OpenTelemetry; standard `OTEL_*` environment variables win over the `otel.*` config keys.',
 						'- Tests run applications with `coretest.Start` and assert telemetry in memory with the `oteltest` packages.',
@@ -66,8 +97,13 @@ export default defineConfig({
 					customSets: [
 						{
 							label: 'Start here',
-							description: 'overview, getting started guide, demo application, and the rules for agents writing oryn code',
-							paths: ['index', 'getting-started', 'demo', 'agents'],
+							description: 'overview, getting started guide, and the rules for agents writing oryn code',
+							paths: ['index', 'getting-started', 'agents'],
+						},
+						{
+							label: 'Demo',
+							description: 'the demo application: one tasks module served over HTTP, gRPC and MCP, entrypoints, telemetry and tests',
+							paths: ['demo/**'],
 						},
 						{
 							label: 'Core',
@@ -78,6 +114,16 @@ export default defineConfig({
 							label: 'HTTP server',
 							description: 'the httpserver module: handlers, middlewares, handler groups, observability and testing',
 							paths: ['httpserver/**'],
+						},
+						{
+							label: 'gRPC server',
+							description: 'the grpcserver module: services, interceptors, health, reflection, observability and testing',
+							paths: ['grpcserver/**'],
+						},
+						{
+							label: 'MCP server',
+							description: 'the mcpserver module: MCP tools, resources and prompts, streamable HTTP, observability and testing',
+							paths: ['mcpserver/**'],
 						},
 						{
 							label: 'SQL',

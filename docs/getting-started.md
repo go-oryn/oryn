@@ -155,7 +155,7 @@ go test ./...
 
 ## Next steps
 
-- [Demo application](demo.md): a complete application, with a database, migrations and a local observability stack.
+- [Demo application](demo/overview.md): a complete application, serving one tasks module over HTTP, gRPC and MCP, with a database and its telemetry.
 - [Application](core/application.md): how an oryn application is assembled.
-- [HTTP server](httpserver/overview.md): handlers, middlewares and handler groups.
+- [HTTP server](httpserver/overview.md), [gRPC server](grpcserver/overview.md), [MCP server](mcpserver/overview.md): the servers of your APIs.
 - [OpenTelemetry](core/opentelemetry.md): exporters, sampling and the `OTEL_*` variables.
