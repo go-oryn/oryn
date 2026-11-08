@@ -11,6 +11,10 @@
     "core": {
       "component": "core",
       "initial-version": "0.1.0"
+    },
+    "httpserver": {
+      "component": "httpserver",
+      "initial-version": "0.1.0"
     }
   }
 }

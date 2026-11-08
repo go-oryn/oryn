@@ -25,6 +25,9 @@ flag_management:
     - name: core
       paths:
         - core/
+    - name: httpserver
+      paths:
+        - httpserver/
 
 ignore:
   - "**/*_test.go"

@@ -25,7 +25,7 @@ Each module is a Go module of this repository, versioned and released independen
 | Module | Description | Status |
 |---|---|---|
 | [core](core) | Runtime, configuration, OpenTelemetry, logging, health checks, test helpers | In progress |
-| httpserver | HTTP server on `net/http`, with routes and middlewares registered through fx | Planned |
+| [httpserver](httpserver) | HTTP server on `net/http`, with handlers, middlewares and handler groups registered through fx | In progress |
 | httpclient | Instrumented HTTP client | Planned |
 | grpcserver | gRPC server, with services and interceptors registered through fx | Planned |
 | grpcclient | Instrumented gRPC client connections | Planned |
