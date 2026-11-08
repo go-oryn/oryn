@@ -15,6 +15,10 @@
     "httpserver": {
       "component": "httpserver",
       "initial-version": "0.1.0"
+    },
+    "sql": {
+      "component": "sql",
+      "initial-version": "0.1.0"
     }
   }
 }

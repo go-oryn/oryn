@@ -28,6 +28,9 @@ flag_management:
     - name: httpserver
       paths:
         - httpserver/
+    - name: sql
+      paths:
+        - sql/
 
 ignore:
   - "**/*_test.go"
